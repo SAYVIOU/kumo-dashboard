@@ -676,12 +676,13 @@ async function fetchMarketData() {
 }
 
 async function fetchStockData(ticker) {
-  const [ohlcv, rsiData, macdData, quoteData] = await Promise.all([
-    fetch(`https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=30&apikey=${TWELVEDATA_KEY}`).then(r => r.json()),
-    fetch(`https://api.twelvedata.com/rsi?symbol=${ticker}&interval=1day&time_period=14&apikey=${TWELVEDATA_KEY}`).then(r => r.json()),
-    fetch(`https://api.twelvedata.com/macd?symbol=${ticker}&interval=1day&apikey=${TWELVEDATA_KEY}`).then(r => r.json()),
-    fetch(`https://api.twelvedata.com/quote?symbol=${ticker}&apikey=${TWELVEDATA_KEY}`).then(r => r.json())
-  ]);
+  const ohlcv = await fetch(`https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=30&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
+  await new Promise(r => setTimeout(r, 1000));
+  const rsiData = await fetch(`https://api.twelvedata.com/rsi?symbol=${ticker}&interval=1day&time_period=14&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
+  await new Promise(r => setTimeout(r, 1000));
+  const macdData = await fetch(`https://api.twelvedata.com/macd?symbol=${ticker}&interval=1day&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
+  await new Promise(r => setTimeout(r, 1000));
+  const quoteData = await fetch(`https://api.twelvedata.com/quote?symbol=${ticker}&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
 
   const values = ohlcv.data?.values || [];
   const close = parseFloat(values[0]?.close || 0);
