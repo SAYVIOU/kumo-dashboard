@@ -280,27 +280,30 @@ async function fetchYahoo(symbol) {
 
 async function fetchMarket(symbol, id, format) {
   try {
-    const url = CORS + encodeURIComponent(YAHOO + symbol + '?interval=1d&range=5d');
+    const url = CORS + encodeURIComponent(YAHOO + symbol + '?interval=1d&range=1mo');
     const res = await fetch(url);
     const json = await res.json();
-    const meta = json.chart.result[0].meta;
+    const result = json.chart?.result?.[0];
+    if (!result) return;
+    const meta = result.meta;
     const price = meta.regularMarketPrice;
     const prev = meta.chartPreviousClose;
+    if (!price || !prev) return;
     const change = ((price - prev) / prev * 100).toFixed(2);
     document.getElementById(id + '-price').textContent = format(price);
     const el = document.getElementById(id + '-change');
     el.textContent = (change >= 0 ? '+' : '') + change + '%';
     el.className = 'market-chip-change ' + (change >= 0 ? 'positive' : 'negative');
-  } catch(e) {}
+  } catch(e) { console.warn('fetchMarket', id, e); }
 }
 
 async function fetchMarketData() {
   await Promise.all([
-    fetchMarket('SPY', 'spy', p => '$' + p.toFixed(2)),
-    fetchMarket('QQQ', 'qqq', p => '$' + p.toFixed(2)),
-    fetchMarket('%5EVIX', 'vix', p => p.toFixed(2)),
-    fetchMarket('GLD', 'gold', p => '$' + p.toFixed(2)),
-    fetchMarket('BTC-USD', 'btc', p => '$' + Math.round(p).toLocaleString()),
+    fetchMarket('SPY',   'spy',  p => '$' + p.toFixed(2)),
+    fetchMarket('QQQ',   'qqq',  p => '$' + p.toFixed(2)),
+    fetchMarket('^VIX',  'vix',  p => p.toFixed(2)),
+    fetchMarket('GLD',   'gold', p => '$' + p.toFixed(2)),
+    fetchMarket('BTC-USD','btc', p => '$' + Math.round(p).toLocaleString()),
   ]);
 }
 
