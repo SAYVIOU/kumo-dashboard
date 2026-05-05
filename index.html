@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kumo Analyst — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   :root {
     --bg: #0a0a0f;
@@ -20,484 +19,131 @@
     --muted: #6b6b8a;
     --card: #13131d;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #07070e; color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-  body {
-    background: #07070e;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background */
+  /* Fond animé amélioré */
   body::before {
     content: '';
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
     background: radial-gradient(ellipse at 20% 20%, #5865F228 0%, transparent 48%),
                 radial-gradient(ellipse at 80% 80%, #00e67614 0%, transparent 48%),
                 radial-gradient(ellipse at 60% 10%, #a855f710 0%, transparent 40%);
     animation: bgMove 20s ease-in-out infinite alternate;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
-  /* Dot grid */
+  /* Grille de points */
   body::after {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
+    background-image: radial-gradient(circle, #ffffff07 1px, transparent 1px);
     background-size: 28px 28px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
-  @keyframes bgMove {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(3%, 3%); }
-  }
-
+  @keyframes bgMove { 0% { transform: translate(0,0); } 100% { transform: translate(3%,3%); } }
   .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
 
-  /* Header */
+  /* Header glassmorphism */
   header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
     padding: 20px 0;
-    background: rgba(7, 7, 14, 0.75);
+    background: rgba(7, 7, 14, 0.55);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.06);
     margin-bottom: 32px;
-    margin-left: -24px;
-    margin-right: -24px;
-    padding-left: 24px;
-    padding-right: 24px;
   }
 
-  .header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 12px; }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
+  /* Logo icon avec glow pulsé */
   .logo-icon {
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     background: linear-gradient(135deg, var(--blue), #00e676);
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
     box-shadow: 0 0 18px -2px #5865F280, 0 0 40px -8px #00e67650;
     animation: logoGlow 3s ease-in-out infinite alternate;
   }
-
   @keyframes logoGlow {
     from { box-shadow: 0 0 18px -2px #5865F280, 0 0 40px -8px #00e67650; }
     to   { box-shadow: 0 0 28px -2px #5865F2bb, 0 0 55px -4px #00e67680; }
   }
 
-  .logo-text {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-
-  .logo-sub {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .market-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
+  .logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .market-status { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
   .status-dot.closed { background: var(--red); animation: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .last-update { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 8px; }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .last-update {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Market overview bar */
-  .market-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 32px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .market-bar::-webkit-scrollbar { height: 2px; }
-  .market-bar::-webkit-scrollbar-track { background: transparent; }
-  .market-bar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .market-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: border-color 0.2s;
-  }
-
+  /* Market bar */
+  .market-bar { display: flex; gap: 16px; margin-bottom: 32px; overflow-x: auto; padding-bottom: 4px; }
+  .market-chip { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; white-space: nowrap; flex-shrink: 0; transition: border-color 0.2s, box-shadow 0.2s; }
   .market-chip:hover { border-color: var(--blue); box-shadow: 0 0 16px -4px var(--blue); }
-
   .market-chip-name { font-size: 13px; color: var(--muted); }
   .market-chip-price { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
   .market-chip-change { font-size: 13px; font-family: 'JetBrains Mono', monospace; }
   .positive { color: var(--green); }
   .negative { color: var(--red); }
-  .neutral { color: var(--yellow); }
 
-  /* Section title */
-  .section-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 16px;
-  }
-
-  /* Stock grid */
-  .stocks-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
+  .section-title { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+  .stocks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; margin-bottom: 32px; }
 
   /* Stock card */
-  .stock-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stock-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent, var(--blue)), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
+  .stock-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s ease; position: relative; overflow: hidden; animation: cardEnter 0.55s cubic-bezier(0.16,1,0.3,1) both; opacity: 0; }
+  .stock-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent, var(--blue)), transparent); opacity: 0; transition: opacity 0.3s; }
   .stock-card:hover { border-color: var(--accent, #ffffff20); transform: translateY(-3px); box-shadow: 0 0 0 1px var(--accent, #ffffff15), 0 0 28px -4px var(--accent, #00000040), 0 12px 40px #00000060; }
   .stock-card:hover::before { opacity: 1; }
-
   .stock-card.positive { --accent: var(--green); }
   .stock-card.negative { --accent: var(--red); }
-  .stock-card.neutral { --accent: var(--yellow); }
+  @keyframes cardEnter { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-  }
-
-  .stock-info { flex: 1; }
-
-  .stock-ticker {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-bottom: 2px;
-  }
-
-  .stock-name {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .stock-score {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-  }
-
-  .score-badge {
-    font-size: 18px;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .score-label {
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .score-bar {
-    width: 60px;
-    height: 4px;
-    background: var(--bg3);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .score-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 1s ease;
-  }
-
-  /* Price section */
-  .price-section {
-    margin-bottom: 16px;
-  }
-
-  .price-main {
-    font-size: 32px;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -1px;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .price-change {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-  }
-
-  .price-change-abs { }
-  .price-change-pct { opacity: 0.8; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .stock-ticker { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px; }
+  .stock-name { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .stock-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .score-badge { font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar { width: 60px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .price-main { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+  .price-change { display: flex; align-items: center; gap: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 12px; }
   .price-period { font-size: 11px; color: var(--muted); font-weight: 400; }
-
-  /* Mini chart */
-  .chart-container {
-    height: 80px;
-    margin: 12px -4px;
-    position: relative;
-  }
-
-  /* Stats grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-  }
-
-  .stat-item { }
-
-  .stat-label {
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 2px;
-  }
-
-  .stat-value {
-    font-size: 13px;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Market hours */
-  .market-hours {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .hours-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* RSI indicator */
-  .indicators {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .indicator-pill {
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    border: 1px solid transparent;
-  }
-
+  .chart-container { height: 80px; margin: 12px -4px; position: relative; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+  .stat-value { font-size: 13px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .market-hours { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .hours-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .indicators { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .indicator-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; border: 1px solid transparent; }
   .pill-green { background: #00e67615; color: var(--green); border-color: #00e67630; }
   .pill-red { background: #ff525215; color: var(--red); border-color: #ff525230; }
   .pill-yellow { background: #ffcc0015; color: var(--yellow); border-color: #ffcc0030; }
   .pill-blue { background: #5865F215; color: #818cf8; border-color: #5865F230; }
-
-  /* Loading state */
-  .loading-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    animation: shimmer 1.5s ease-in-out infinite;
-  }
-
-  @keyframes shimmer {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
-
-  .skeleton {
-    background: var(--bg3);
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-
-  /* Refresh button */
-  .refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: var(--blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .loading-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: shimmer 1.5s ease-in-out infinite; }
+  @keyframes shimmer { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+  .skeleton { background: var(--bg3); border-radius: 4px; margin-bottom: 8px; }
+  .refresh-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--blue); color: white; border: none; border-radius: 8px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
   .refresh-btn:hover { background: #6875f5; transform: translateY(-1px); }
-  .refresh-btn:active { transform: translateY(0); }
   .refresh-btn.loading { opacity: 0.7; pointer-events: none; }
-
   .refresh-icon { transition: transform 0.5s; }
   .refresh-btn.loading .refresh-icon { animation: spin 1s linear infinite; }
-
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-  /* Error state */
-  .error-msg {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .stocks-grid { grid-template-columns: 1fr; }
-    .header-inner { flex-wrap: wrap; gap: 12px; }
-    .price-main { font-size: 26px; }
-  }
-
-  /* Tooltip */
-  .tv-link {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .card-footer-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: var(--blue);
-    text-decoration: none;
-    margin-top: 8px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-  }
-
+  .card-footer-link { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--blue); text-decoration: none; margin-top: 8px; opacity: 0.7; transition: opacity 0.2s; }
   .card-footer-link:hover { opacity: 1; }
-
-  /* Fade in animation */
-  .stock-card {
-    animation: cardEnter 0.55s cubic-bezier(0.16,1,0.3,1) both;
-    opacity: 0;
-  }
-
-  @keyframes cardEnter {
-    from { opacity: 0; transform: translateY(18px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
+  @media (max-width: 768px) { .stocks-grid { grid-template-columns: 1fr; } .header-inner { flex-wrap: wrap; gap: 12px; } .price-main { font-size: 26px; } }
 </style>
 </head>
 <body>
-
 <div class="container">
   <header>
     <div class="header-inner">
@@ -518,233 +164,156 @@
         </button>
       </div>
     </div>
-    <div class="last-update" id="lastUpdate" style="margin-top: 8px;">Chargement des données...</div>
+    <div class="last-update" id="lastUpdate">Chargement des données...</div>
   </header>
 
-  <!-- Market overview -->
-  <div class="market-bar" id="marketBar">
+  <div class="market-bar">
     <div class="market-chip"><div class="market-chip-name">S&P 500</div><div class="market-chip-price" id="spy-price">—</div><div class="market-chip-change" id="spy-change">—</div></div>
     <div class="market-chip"><div class="market-chip-name">Nasdaq</div><div class="market-chip-price" id="qqq-price">—</div><div class="market-chip-change" id="qqq-change">—</div></div>
     <div class="market-chip"><div class="market-chip-name">VIX</div><div class="market-chip-price" id="vix-price">—</div><div class="market-chip-change" id="vix-change">—</div></div>
+    <div class="market-chip"><div class="market-chip-name">Or (GLD)</div><div class="market-chip-price" id="gold-price">—</div><div class="market-chip-change" id="gold-change">—</div></div>
+    <div class="market-chip"><div class="market-chip-name">Bitcoin</div><div class="market-chip-price" id="btc-price">—</div><div class="market-chip-change" id="btc-change">—</div></div>
   </div>
 
   <div class="section-title">Mes actions suivies</div>
-  <div class="stocks-grid" id="stocksGrid">
-    <!-- Cards generated by JS -->
-  </div>
+  <div class="stocks-grid" id="stocksGrid"></div>
 </div>
 
 <script>
-const TWELVEDATA_KEY = 'REMPLACE_PAR_TA_CLE_TWELVEDATA';
-
 const TICKERS = ['AAPL', 'NVDA', 'AMZN', 'MSFT', 'META', 'TSLA', 'GOOGL'];
-
 const NAMES = {
-  AAPL: 'Apple Inc. — NASDAQ',
-  NVDA: 'NVIDIA Corp. — NASDAQ',
-  AMZN: 'Amazon.com — NASDAQ',
-  MSFT: 'Microsoft Corp. — NASDAQ',
-  META: 'Meta Platforms — NASDAQ',
-  TSLA: 'Tesla Inc. — NASDAQ',
+  AAPL: 'Apple Inc. — NASDAQ', NVDA: 'NVIDIA Corp. — NASDAQ',
+  AMZN: 'Amazon.com — NASDAQ', MSFT: 'Microsoft Corp. — NASDAQ',
+  META: 'Meta Platforms — NASDAQ', TSLA: 'Tesla Inc. — NASDAQ',
   GOOGL: 'Alphabet Inc. — NASDAQ'
 };
+const CORS = 'https://corsproxy.io/?';
+const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 
 function isMarketOpen() {
-  const now = new Date();
-  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const day = nyTime.getDay();
-  const hours = nyTime.getHours();
-  const minutes = nyTime.getMinutes();
-  const time = hours * 60 + minutes;
-  return day >= 1 && day <= 5 && time >= 570 && time <= 960; // 9h30 - 16h00
+  const ny = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const d = ny.getDay(), t = ny.getHours() * 60 + ny.getMinutes();
+  return d >= 1 && d <= 5 && t >= 570 && t <= 960;
 }
 
 function timeUntilEvent() {
-  const now = new Date();
-  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const day = nyTime.getDay();
-  const hours = nyTime.getHours();
-  const minutes = nyTime.getMinutes();
-  const time = hours * 60 + minutes;
-
-  if (isMarketOpen()) {
-    const closeTime = 960;
-    const diff = closeTime - time;
-    return `Ferme dans ${Math.floor(diff/60)}h${String(diff%60).padStart(2,'0')}`;
-  } else {
-    let nextOpen = 570;
-    let daysUntil = 0;
-    let d = day;
-    while (true) {
-      if (d === 0) d = 1;
-      else if (d === 6) d = 1;
-      else if (time < nextOpen && d >= 1 && d <= 5) break;
-      else { d = (d % 7) + 1; daysUntil++; }
-      if (daysUntil > 7) break;
-    }
-    if (daysUntil === 0) {
-      const diff = nextOpen - time;
-      return `Ouvre dans ${Math.floor(diff/60)}h${String(diff%60).padStart(2,'0')}`;
-    }
-    return `Ouvre dans ${daysUntil}j`;
-  }
+  const ny = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const t = ny.getHours() * 60 + ny.getMinutes();
+  if (isMarketOpen()) { const d = 960 - t; return `Ferme dans ${Math.floor(d/60)}h${String(d%60).padStart(2,'0')}`; }
+  if (t < 570) { const d = 570 - t; return `Ouvre dans ${Math.floor(d/60)}h${String(d%60).padStart(2,'0')}`; }
+  return `Ouvre demain à 15h30`;
 }
 
-function getScoreColor(score) {
-  if (score >= 8) return 'var(--green)';
-  if (score >= 6) return 'var(--yellow)';
-  if (score >= 4) return '#ff9800';
-  return 'var(--red)';
+function getScoreColor(s) { return s >= 8 ? 'var(--green)' : s >= 6 ? 'var(--yellow)' : s >= 4 ? '#ff9800' : 'var(--red)'; }
+
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return 50;
+  let g = 0, l = 0;
+  for (let i = 1; i <= period; i++) { const d = closes[i] - closes[i-1]; d > 0 ? g += d : l -= d; }
+  const ag = g / period, al = l / period;
+  if (al === 0) return 100;
+  return 100 - (100 / (1 + ag / al));
 }
 
-function getScoreEmoji(score) {
-  if (score >= 8) return '🟢';
-  if (score >= 6) return '🟡';
-  if (score >= 4) return '🟠';
-  return '🔴';
+function calcMACD(closes) {
+  const ema = (data, p) => { const k = 2/(p+1); let e = data[0]; for (let i=1;i<data.length;i++) e = data[i]*k+e*(1-k); return e; };
+  if (closes.length < 26) return 0;
+  return ema(closes.slice(-12), 12) - ema(closes.slice(-26), 26);
 }
 
-function calcScore(rsi, macdHist, variation) {
-  let score = 5;
-  if (rsi < 30) score += 2;
-  else if (rsi < 45) score += 1;
-  else if (rsi > 70) score -= 2;
-  else if (rsi > 60) score -= 1;
-  if (macdHist > 1) score += 2;
-  else if (macdHist > 0) score += 1;
-  else if (macdHist < -1) score -= 2;
-  else if (macdHist < 0) score -= 1;
-  if (variation > 1) score += 1;
-  else if (variation < -1) score -= 1;
-  return Math.min(10, Math.max(0, score));
+function calcScore(rsi, macd, variation) {
+  let s = 5;
+  if (rsi < 30) s += 2; else if (rsi < 45) s += 1; else if (rsi > 70) s -= 2; else if (rsi > 60) s -= 1;
+  if (macd > 0.5) s += 2; else if (macd > 0) s += 1; else if (macd < -0.5) s -= 2; else if (macd < 0) s -= 1;
+  if (variation > 1) s += 1; else if (variation < -1) s -= 1;
+  return Math.min(10, Math.max(0, s));
 }
 
-function formatCap(val) {
-  if (val >= 1e12) return '$' + (val / 1e12).toFixed(2) + 'T';
-  if (val >= 1e9) return '$' + (val / 1e9).toFixed(2) + 'B';
-  return '$' + (val / 1e6).toFixed(0) + 'M';
-}
-
-function drawSparkline(containerId, prices, isPositive) {
-  const container = document.getElementById(containerId);
-  if (!container || prices.length < 2) return;
-
-  const color = isPositive ? '#00e676' : '#ff5252';
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const w = container.offsetWidth;
-  const h = 80;
-
+function drawSparkline(id, prices, isPos) {
+  const el = document.getElementById(id);
+  if (!el || prices.length < 2) return;
+  const color = isPos ? '#00e676' : '#ff5252';
+  const min = Math.min(...prices), max = Math.max(...prices), range = max - min || 1;
+  const w = el.offsetWidth || 380, h = 80;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', h);
-  svg.style.overflow = 'visible';
-
-  const points = prices.map((p, i) => {
-    const x = (i / (prices.length - 1)) * w;
-    const y = h - ((p - min) / range) * (h - 10) - 5;
-    return `${x},${y}`;
-  });
-
-  // Fill area
-  const fillPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  const fillD = `M ${points[0]} L ${points.join(' L ')} L ${w},${h} L 0,${h} Z`;
-  fillPath.setAttribute('d', fillD);
-  fillPath.setAttribute('fill', color);
-  fillPath.setAttribute('fill-opacity', '0.08');
-  svg.appendChild(fillPath);
-
-  // Line
+  svg.setAttribute('width', '100%'); svg.setAttribute('height', h); svg.style.overflow = 'visible';
+  const pts = prices.map((p, i) => `${(i/(prices.length-1))*w},${h-((p-min)/range)*(h-10)-5}`);
+  const fill = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  fill.setAttribute('d', `M ${pts[0]} L ${pts.join(' L ')} L ${w},${h} L 0,${h} Z`);
+  fill.setAttribute('fill', color); fill.setAttribute('fill-opacity', '0.08'); svg.appendChild(fill);
   const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-  line.setAttribute('points', points.join(' '));
-  line.setAttribute('fill', 'none');
-  line.setAttribute('stroke', color);
-  line.setAttribute('stroke-width', '2');
-  line.setAttribute('stroke-linejoin', 'round');
-  svg.appendChild(line);
-
-  // Last dot
-  const lastPoint = points[points.length - 1].split(',');
+  line.setAttribute('points', pts.join(' ')); line.setAttribute('fill', 'none');
+  line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2'); svg.appendChild(line);
+  const lp = pts[pts.length-1].split(',');
   const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  dot.setAttribute('cx', lastPoint[0]);
-  dot.setAttribute('cy', lastPoint[1]);
-  dot.setAttribute('r', '3');
-  dot.setAttribute('fill', color);
-  svg.appendChild(dot);
+  dot.setAttribute('cx', lp[0]); dot.setAttribute('cy', lp[1]); dot.setAttribute('r', '3');
+  dot.setAttribute('fill', color); svg.appendChild(dot);
+  el.innerHTML = ''; el.appendChild(svg);
+}
 
-  container.innerHTML = '';
-  container.appendChild(svg);
+async function fetchYahoo(symbol) {
+  const url = CORS + encodeURIComponent(YAHOO + symbol + '?interval=1d&range=3mo');
+  const res = await fetch(url);
+  const json = await res.json();
+  const result = json.chart.result[0];
+  const meta = result.meta;
+  const q = result.indicators.quote[0];
+  const closes = q.close.filter(Boolean);
+  const close = meta.regularMarketPrice || closes[closes.length-1];
+  const prev = meta.chartPreviousClose || closes[closes.length-2];
+  const variation = ((close - prev) / prev * 100);
+  const rsi = calcRSI([...closes].reverse());
+  const macdHist = calcMACD([...closes]);
+  const score = calcScore(rsi, macdHist, variation);
+  return {
+    close, variation,
+    high: meta.regularMarketDayHigh || Math.max(...q.high.filter(Boolean)),
+    low: meta.regularMarketDayLow || Math.min(...q.low.filter(Boolean)),
+    open: meta.regularMarketOpen || prev,
+    volume: meta.regularMarketVolume || q.volume.filter(Boolean).pop(),
+    high52: meta.fiftyTwoWeekHigh || Math.max(...q.high.filter(Boolean)),
+    low52: meta.fiftyTwoWeekLow || Math.min(...q.low.filter(Boolean)),
+    rsi, macdHist, score,
+    prices: closes.slice(-30)
+  };
+}
+
+async function fetchMarket(symbol, id, format) {
+  try {
+    const url = CORS + encodeURIComponent(YAHOO + symbol + '?interval=1d&range=5d');
+    const res = await fetch(url);
+    const json = await res.json();
+    const meta = json.chart.result[0].meta;
+    const price = meta.regularMarketPrice;
+    const prev = meta.chartPreviousClose;
+    const change = ((price - prev) / prev * 100).toFixed(2);
+    document.getElementById(id + '-price').textContent = format(price);
+    const el = document.getElementById(id + '-change');
+    el.textContent = (change >= 0 ? '+' : '') + change + '%';
+    el.className = 'market-chip-change ' + (change >= 0 ? 'positive' : 'negative');
+  } catch(e) {}
 }
 
 async function fetchMarketData() {
-  try {
-    const [spyRes, qqqRes, vixRes] = await Promise.all([
-      fetch(`https://api.twelvedata.com/quote?symbol=SPY&apikey=${TWELVEDATA_KEY}`).then(r => r.json()),
-      fetch(`https://api.twelvedata.com/quote?symbol=QQQ&apikey=${TWELVEDATA_KEY}`).then(r => r.json()),
-      fetch(`https://api.twelvedata.com/quote?symbol=VIX&apikey=${TWELVEDATA_KEY}`).then(r => r.json())
-    ]);
-
-    const updateChip = (id, data) => {
-      const priceEl = document.getElementById(id + '-price');
-      const changeEl = document.getElementById(id + '-change');
-      if (!priceEl || !data.close) return;
-      const price = parseFloat(data.close).toFixed(2);
-      const change = parseFloat(data.percent_change || 0).toFixed(2);
-      priceEl.textContent = '$' + price;
-      changeEl.textContent = (change >= 0 ? '+' : '') + change + '%';
-      changeEl.className = 'market-chip-change ' + (change >= 0 ? 'positive' : 'negative');
-    };
-
-    updateChip('spy', spyRes);
-    updateChip('qqq', qqqRes);
-    updateChip('vix', vixRes);
-  } catch (e) {
-    console.error('Market data error:', e);
-  }
+  await Promise.all([
+    fetchMarket('SPY', 'spy', p => '$' + p.toFixed(2)),
+    fetchMarket('QQQ', 'qqq', p => '$' + p.toFixed(2)),
+    fetchMarket('%5EVIX', 'vix', p => p.toFixed(2)),
+    fetchMarket('GLD', 'gold', p => '$' + p.toFixed(2)),
+    fetchMarket('BTC-USD', 'btc', p => '$' + Math.round(p).toLocaleString()),
+  ]);
 }
 
-async function fetchStockData(ticker) {
-  const ohlcv = await fetch(`https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=30&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
-  await new Promise(r => setTimeout(r, 8000));
-  const rsiData = await fetch(`https://api.twelvedata.com/rsi?symbol=${ticker}&interval=1day&time_period=14&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
-  await new Promise(r => setTimeout(r, 8000));
-  const macdData = await fetch(`https://api.twelvedata.com/macd?symbol=${ticker}&interval=1day&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
-  await new Promise(r => setTimeout(r, 8000));
-  const quoteData = await fetch(`https://api.twelvedata.com/quote?symbol=${ticker}&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
-
-  const values = ohlcv.values || ohlcv.data?.values || [];
-  const close = parseFloat(values[0]?.close || 0);
-  const closePrev = parseFloat(values[1]?.close || close);
-  const variation = ((close - closePrev) / closePrev * 100);
-  const rsi = parseFloat(rsiData.values?.[0]?.rsi || rsiData.data?.values?.[0]?.rsi || 50);
-  const macdHist = parseFloat(macdData.values?.[0]?.macd_hist || macdData.data?.values?.[0]?.macd_hist || 0);
-  const high = parseFloat(values[0]?.high || 0);
-  const low = parseFloat(values[0]?.low || 0);
-  const volume = parseInt(values[0]?.volume || 0);
-  const open = parseFloat(quoteData.open || values[0]?.open || 0);
-  const cap = parseFloat(quoteData.market_cap || 0);
-  const high52 = Math.max(...values.slice(0, 52).map(v => parseFloat(v.high)));
-  const low52 = Math.min(...values.slice(0, 52).map(v => parseFloat(v.low)));
-  const prices = values.slice(0, 30).reverse().map(v => parseFloat(v.close));
-  const score = calcScore(rsi, macdHist, variation);
-
-  return { ticker, close, closePrev, variation, rsi, macdHist, high, low, open, volume, cap, high52, low52, prices, score };
-}
-
-function createCard(data, index) {
-  const { ticker, close, variation, rsi, macdHist, high, low, open, volume, cap, high52, low52, score } = data;
+function createCard(ticker, data, index) {
+  const { close, variation, rsi, macdHist, high, low, open, volume, high52, low52, score } = data;
   const isPos = variation >= 0;
-  const scoreColor = getScoreColor(score);
-  const rsiStatus = rsi > 70 ? ['🔴 Suracheté', 'pill-red'] : rsi < 30 ? ['🟢 Survendu', 'pill-green'] : ['🟡 Neutre', 'pill-yellow'];
-  const macdStatus = macdHist > 0 ? ['🟢 MACD+', 'pill-green'] : ['🔴 MACD−', 'pill-red'];
-  const marketOpen = isMarketOpen();
-  const timeInfo = timeUntilEvent();
-
+  const sc = getScoreColor(score);
+  const rsiTag = rsi > 70 ? ['🔴 Suracheté', 'pill-red'] : rsi < 30 ? ['🟢 Survendu', 'pill-green'] : ['🟡 Neutre', 'pill-yellow'];
+  const macdTag = macdHist > 0 ? ['🟢 MACD+', 'pill-green'] : ['🔴 MACD−', 'pill-red'];
+  const absChange = Math.abs(close - close / (1 + variation/100)).toFixed(2);
   const card = document.createElement('div');
   card.className = `stock-card ${isPos ? 'positive' : 'negative'}`;
-  card.style.animationDelay = (index * 0.08) + 's';
-
+  card.style.animationDelay = (index * 0.06) + 's';
   card.innerHTML = `
     <div class="card-header">
       <div class="stock-info">
@@ -752,148 +321,90 @@ function createCard(data, index) {
         <div class="stock-name">${NAMES[ticker] || ticker}</div>
       </div>
       <div class="stock-score">
-        <div class="score-badge" style="color: ${scoreColor}">${score}<span style="font-size:12px;opacity:0.5">/10</span></div>
+        <div class="score-badge" style="color:${sc}">${score}<span style="font-size:12px;opacity:0.5">/10</span></div>
         <div class="score-label">Score IA</div>
-        <div class="score-bar">
-          <div class="score-fill" style="width: ${score * 10}%; background: ${scoreColor}"></div>
-        </div>
+        <div class="score-bar"><div class="score-fill" style="width:${score*10}%;background:${sc}"></div></div>
       </div>
     </div>
-
-    <div class="price-section">
-      <div class="price-main" style="color: ${isPos ? 'var(--green)' : 'var(--red)'}">
-        $${close.toFixed(2)}
-      </div>
-      <div class="price-change ${isPos ? 'positive' : 'negative'}">
-        <span class="price-change-abs">${isPos ? '+' : ''}${(close - (close / (1 + variation/100))).toFixed(2)}</span>
-        <span class="price-change-pct">(${isPos ? '+' : ''}${variation.toFixed(2)}%)</span>
-        <span class="price-period">aujourd'hui</span>
-      </div>
+    <div class="price-main" style="color:${isPos?'var(--green)':'var(--red)'}">$${close.toFixed(2)}</div>
+    <div class="price-change ${isPos?'positive':'negative'}">
+      <span>${isPos?'+':'-'}$${absChange}</span>
+      <span>(${isPos?'+':''}${variation.toFixed(2)}%)</span>
+      <span class="price-period">aujourd'hui</span>
     </div>
-
     <div class="chart-container" id="chart-${ticker}"></div>
-
     <div class="indicators">
-      <span class="indicator-pill ${rsiStatus[1]}">${rsiStatus[0]} ${rsi.toFixed(1)}</span>
-      <span class="indicator-pill ${macdStatus[1]}">${macdStatus[0]}</span>
+      <span class="indicator-pill ${rsiTag[1]}">${rsiTag[0]} ${rsi.toFixed(1)}</span>
+      <span class="indicator-pill ${macdTag[1]}">${macdTag[0]}</span>
       <span class="indicator-pill pill-blue">Score ${score}/10</span>
     </div>
-
     <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-label">Ouverture</div>
-        <div class="stat-value">$${open.toFixed(2)}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Haut</div>
-        <div class="stat-value" style="color: var(--green)">$${high.toFixed(2)}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Bas</div>
-        <div class="stat-value" style="color: var(--red)">$${low.toFixed(2)}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Volume</div>
-        <div class="stat-value">${(volume/1e6).toFixed(1)}M</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">52s Haut</div>
-        <div class="stat-value">$${high52.toFixed(2)}</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">52s Bas</div>
-        <div class="stat-value">$${low52.toFixed(2)}</div>
-      </div>
+      <div class="stat-item"><div class="stat-label">Ouverture</div><div class="stat-value">$${open.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Haut</div><div class="stat-value" style="color:var(--green)">$${high.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Bas</div><div class="stat-value" style="color:var(--red)">$${low.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Volume</div><div class="stat-value">${(volume/1e6).toFixed(1)}M</div></div>
+      <div class="stat-item"><div class="stat-label">52s Haut</div><div class="stat-value">$${high52.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">52s Bas</div><div class="stat-value">$${low52.toFixed(2)}</div></div>
     </div>
-
     <div class="market-hours">
-      <div class="hours-dot" style="background: ${marketOpen ? 'var(--green)' : 'var(--red)'}"></div>
-      <span>${marketOpen ? 'Marché ouvert' : 'Marché fermé'} — ${timeInfo}</span>
+      <div class="hours-dot" style="background:${isMarketOpen()?'var(--green)':'var(--red)'}"></div>
+      <span>${isMarketOpen()?'Marché ouvert':'Marché fermé'} — ${timeUntilEvent()}</span>
     </div>
-
-    <a href="https://www.tradingview.com/chart/?symbol=${ticker}" target="_blank" class="card-footer-link">
-      📈 Voir sur TradingView →
-    </a>
+    <a href="https://www.tradingview.com/chart/?symbol=${ticker}" target="_blank" class="card-footer-link">📈 Voir sur TradingView →</a>
   `;
-
   return card;
 }
 
 async function loadAllStocks() {
   const grid = document.getElementById('stocksGrid');
   grid.innerHTML = '';
-
-  // Show skeletons
   TICKERS.forEach(() => {
-    const skeleton = document.createElement('div');
-    skeleton.className = 'loading-card';
-    skeleton.innerHTML = `
-      <div class="skeleton" style="height: 20px; width: 80px; margin-bottom: 16px"></div>
-      <div class="skeleton" style="height: 36px; width: 140px; margin-bottom: 8px"></div>
-      <div class="skeleton" style="height: 80px; margin-bottom: 12px"></div>
-      <div class="skeleton" style="height: 60px"></div>
-    `;
-    grid.appendChild(skeleton);
+    const sk = document.createElement('div');
+    sk.className = 'loading-card';
+    sk.innerHTML = `<div class="skeleton" style="height:20px;width:80px;margin-bottom:16px"></div><div class="skeleton" style="height:36px;width:140px;margin-bottom:8px"></div><div class="skeleton" style="height:80px;margin-bottom:12px"></div><div class="skeleton" style="height:60px"></div>`;
+    grid.appendChild(sk);
   });
 
-  const cards = [];
-  for (let i = 0; i < TICKERS.length; i++) {
-    try {
-      const data = await fetchStockData(TICKERS[i]);
-      cards.push({ data, index: i });
-      await new Promise(r => setTimeout(r, 8000)); // Respect rate limit
-    } catch (e) {
-      console.error('Error fetching', TICKERS[i], e);
-    }
-  }
-
+  const results = await Promise.allSettled(TICKERS.map(t => fetchYahoo(t)));
   grid.innerHTML = '';
-  cards.forEach(({ data, index }) => {
-    const card = createCard(data, index);
-    grid.appendChild(card);
-
-    // Draw sparkline after card is in DOM
-    requestAnimationFrame(() => {
-      drawSparkline(`chart-${data.ticker}`, data.prices, data.variation >= 0);
-    });
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') {
+      const card = createCard(TICKERS[i], r.value, i);
+      grid.appendChild(card);
+      requestAnimationFrame(() => drawSparkline(`chart-${TICKERS[i]}`, r.value.prices, r.value.variation >= 0));
+    } else {
+      const err = document.createElement('div');
+      err.className = 'loading-card';
+      err.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted)">⚠️ ${TICKERS[i]} — Données indisponibles</div>`;
+      grid.appendChild(err);
+    }
   });
 
-  // Update last refresh time
   const now = new Date();
-  document.getElementById('lastUpdate').textContent =
-    `Dernière mise à jour : ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}`;
+  document.getElementById('lastUpdate').textContent = `Dernière mise à jour : ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
 }
 
 function updateMarketStatus() {
   const open = isMarketOpen();
-  const dot = document.getElementById('statusDot');
-  const text = document.getElementById('statusText');
-  dot.className = 'status-dot' + (open ? '' : ' closed');
-  text.textContent = open ? 'Marché ouvert' : 'Marché fermé';
+  document.getElementById('statusDot').className = 'status-dot' + (open ? '' : ' closed');
+  document.getElementById('statusText').textContent = open ? 'Marché ouvert' : 'Marché fermé';
 }
 
 async function refreshAll() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('loading');
-  btn.textContent = '↻ Chargement...';
-
+  btn.innerHTML = '<span class="refresh-icon">↻</span> Chargement...';
   updateMarketStatus();
-  await fetchMarketData();
-  await loadAllStocks();
-
+  await Promise.all([fetchMarketData(), loadAllStocks()]);
   btn.classList.remove('loading');
   btn.innerHTML = '<span class="refresh-icon">↻</span> Actualiser';
 }
 
-// Initial load
 updateMarketStatus();
 fetchMarketData();
 loadAllStocks();
-
-// Auto refresh every 15 min
 setInterval(refreshAll, 15 * 60 * 1000);
 setInterval(updateMarketStatus, 60 * 1000);
 </script>
 </body>
 </html>
-```
