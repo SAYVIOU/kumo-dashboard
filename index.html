@@ -684,12 +684,12 @@ async function fetchStockData(ticker) {
   await new Promise(r => setTimeout(r, 1000));
   const quoteData = await fetch(`https://api.twelvedata.com/quote?symbol=${ticker}&apikey=${TWELVEDATA_KEY}`).then(r => r.json());
 
-  const values = ohlcv.data?.values || [];
+  const values = ohlcv.values || ohlcv.data?.values || [];
   const close = parseFloat(values[0]?.close || 0);
   const closePrev = parseFloat(values[1]?.close || close);
   const variation = ((close - closePrev) / closePrev * 100);
-  const rsi = parseFloat(rsiData.data?.values?.[0]?.rsi || 50);
-  const macdHist = parseFloat(macdData.data?.values?.[0]?.macd_hist || 0);
+  const rsi = parseFloat(rsiData.values?.[0]?.rsi || rsiData.data?.values?.[0]?.rsi || 50);
+  const macdHist = parseFloat(macdData.values?.[0]?.macd_hist || macdData.data?.values?.[0]?.macd_hist || 0);
   const high = parseFloat(values[0]?.high || 0);
   const low = parseFloat(values[0]?.low || 0);
   const volume = parseInt(values[0]?.volume || 0);
