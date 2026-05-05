@@ -94,7 +94,10 @@
   .positive { color: var(--green); }
   .negative { color: var(--red); }
 
-  .section-title { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; margin-top: 8px; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-icon { font-size: 16px; }
   .stocks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; margin-bottom: 32px; }
 
   /* Stock card */
@@ -175,8 +178,19 @@
     <div class="market-chip"><div class="market-chip-name">Bitcoin</div><div class="market-chip-price" id="btc-price">—</div><div class="market-chip-change" id="btc-change">—</div></div>
   </div>
 
-  <div class="section-title">Mes actions suivies</div>
+  <div class="section-header">
+    <span class="section-icon">📈</span>
+    <div class="section-title">Actions</div>
+    <div class="section-line"></div>
+  </div>
   <div class="stocks-grid" id="stocksGrid"></div>
+
+  <div class="section-header" style="margin-top: 32px;">
+    <span class="section-icon">🪙</span>
+    <div class="section-title">Cryptomonnaies</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="stocks-grid" id="cryptosGrid"></div>
 </div>
 
 <script>
@@ -187,6 +201,26 @@ const NAMES = {
   META: 'Meta Platforms — NASDAQ', TSLA: 'Tesla Inc. — NASDAQ',
   GOOGL: 'Alphabet Inc. — NASDAQ'
 };
+
+const CRYPTOS = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'BNB-USD', 'XRP-USD', 'DOGE-USD'];
+const CRYPTO_NAMES = {
+  'BTC-USD':  'Bitcoin',
+  'ETH-USD':  'Ethereum',
+  'SOL-USD':  'Solana',
+  'BNB-USD':  'BNB — Binance',
+  'XRP-USD':  'XRP — Ripple',
+  'DOGE-USD': 'Dogecoin',
+};
+const CRYPTO_LABELS = {
+  'BTC-USD': 'BTC', 'ETH-USD': 'ETH', 'SOL-USD': 'SOL',
+  'BNB-USD': 'BNB', 'XRP-USD': 'XRP', 'DOGE-USD': 'DOGE',
+};
+
+function formatCryptoPrice(price) {
+  if (price >= 1000) return '$' + Math.round(price).toLocaleString('fr-FR');
+  if (price >= 1)    return '$' + price.toFixed(2);
+  return '$' + price.toFixed(4);
+}
 const CORS = 'https://corsproxy.io/?';
 const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 
@@ -307,21 +341,32 @@ async function fetchMarketData() {
   ]);
 }
 
-function createCard(ticker, data, index) {
+function createCard(ticker, data, index, isCrypto = false) {
   const { close, variation, rsi, macdHist, high, low, open, volume, high52, low52, score } = data;
   const isPos = variation >= 0;
   const sc = getScoreColor(score);
   const rsiTag = rsi > 70 ? ['🔴 Suracheté', 'pill-red'] : rsi < 30 ? ['🟢 Survendu', 'pill-green'] : ['🟡 Neutre', 'pill-yellow'];
   const macdTag = macdHist > 0 ? ['🟢 MACD+', 'pill-green'] : ['🔴 MACD−', 'pill-red'];
-  const absChange = Math.abs(close - close / (1 + variation/100)).toFixed(2);
+  const absChange = Math.abs(close - close / (1 + variation/100));
+  const label = isCrypto ? (CRYPTO_LABELS[ticker] || ticker) : ticker;
+  const name  = isCrypto ? (CRYPTO_NAMES[ticker] || ticker) : (NAMES[ticker] || ticker);
+  const priceStr = isCrypto ? formatCryptoPrice(close) : '$' + close.toFixed(2);
+  const absStr   = isCrypto ? formatCryptoPrice(absChange) : '$' + absChange.toFixed(2);
+  const chartId  = 'chart-' + ticker.replace('-','');
+  const tvSymbol = isCrypto ? ticker.replace('-USD','') + 'USD' : ticker;
+  const periodLabel = isCrypto ? '24h' : "aujourd'hui";
+  const marketLine = isCrypto
+    ? `<span style="color:var(--green)">🔁 24h/7j — Marché ouvert en continu</span>`
+    : `<div class="hours-dot" style="background:${isMarketOpen()?'var(--green)':'var(--red)'}"></div><span>${isMarketOpen()?'Marché ouvert':'Marché fermé'} — ${timeUntilEvent()}</span>`;
+
   const card = document.createElement('div');
   card.className = `stock-card ${isPos ? 'positive' : 'negative'}`;
   card.style.animationDelay = (index * 0.06) + 's';
   card.innerHTML = `
     <div class="card-header">
       <div class="stock-info">
-        <div class="stock-ticker">${ticker}</div>
-        <div class="stock-name">${NAMES[ticker] || ticker}</div>
+        <div class="stock-ticker">${label}</div>
+        <div class="stock-name">${name}</div>
       </div>
       <div class="stock-score">
         <div class="score-badge" style="color:${sc}">${score}<span style="font-size:12px;opacity:0.5">/10</span></div>
@@ -329,62 +374,68 @@ function createCard(ticker, data, index) {
         <div class="score-bar"><div class="score-fill" style="width:${score*10}%;background:${sc}"></div></div>
       </div>
     </div>
-    <div class="price-main" style="color:${isPos?'var(--green)':'var(--red)'}">$${close.toFixed(2)}</div>
+    <div class="price-main" style="color:${isPos?'var(--green)':'var(--red)'}">${priceStr}</div>
     <div class="price-change ${isPos?'positive':'negative'}">
-      <span>${isPos?'+':'-'}$${absChange}</span>
+      <span>${isPos?'+':'-'}${absStr}</span>
       <span>(${isPos?'+':''}${variation.toFixed(2)}%)</span>
-      <span class="price-period">aujourd'hui</span>
+      <span class="price-period">${periodLabel}</span>
     </div>
-    <div class="chart-container" id="chart-${ticker}"></div>
+    <div class="chart-container" id="${chartId}"></div>
     <div class="indicators">
       <span class="indicator-pill ${rsiTag[1]}">${rsiTag[0]} ${rsi.toFixed(1)}</span>
       <span class="indicator-pill ${macdTag[1]}">${macdTag[0]}</span>
       <span class="indicator-pill pill-blue">Score ${score}/10</span>
     </div>
     <div class="stats-grid">
-      <div class="stat-item"><div class="stat-label">Ouverture</div><div class="stat-value">$${open.toFixed(2)}</div></div>
-      <div class="stat-item"><div class="stat-label">Haut</div><div class="stat-value" style="color:var(--green)">$${high.toFixed(2)}</div></div>
-      <div class="stat-item"><div class="stat-label">Bas</div><div class="stat-value" style="color:var(--red)">$${low.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Ouverture</div><div class="stat-value">${isCrypto ? formatCryptoPrice(open) : '$'+open.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Haut</div><div class="stat-value" style="color:var(--green)">${isCrypto ? formatCryptoPrice(high) : '$'+high.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">Bas</div><div class="stat-value" style="color:var(--red)">${isCrypto ? formatCryptoPrice(low) : '$'+low.toFixed(2)}</div></div>
       <div class="stat-item"><div class="stat-label">Volume</div><div class="stat-value">${(volume/1e6).toFixed(1)}M</div></div>
-      <div class="stat-item"><div class="stat-label">52s Haut</div><div class="stat-value">$${high52.toFixed(2)}</div></div>
-      <div class="stat-item"><div class="stat-label">52s Bas</div><div class="stat-value">$${low52.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">52s Haut</div><div class="stat-value">${isCrypto ? formatCryptoPrice(high52) : '$'+high52.toFixed(2)}</div></div>
+      <div class="stat-item"><div class="stat-label">52s Bas</div><div class="stat-value">${isCrypto ? formatCryptoPrice(low52) : '$'+low52.toFixed(2)}</div></div>
     </div>
-    <div class="market-hours">
-      <div class="hours-dot" style="background:${isMarketOpen()?'var(--green)':'var(--red)'}"></div>
-      <span>${isMarketOpen()?'Marché ouvert':'Marché fermé'} — ${timeUntilEvent()}</span>
-    </div>
-    <a href="https://www.tradingview.com/chart/?symbol=${ticker}" target="_blank" class="card-footer-link">📈 Voir sur TradingView →</a>
+    <div class="market-hours">${marketLine}</div>
+    <a href="https://www.tradingview.com/chart/?symbol=${tvSymbol}" target="_blank" class="card-footer-link">📈 Voir sur TradingView →</a>
   `;
   return card;
 }
 
-async function loadAllStocks() {
-  const grid = document.getElementById('stocksGrid');
+async function loadGrid(tickers, gridId, isCrypto) {
+  const grid = document.getElementById(gridId);
   grid.innerHTML = '';
-  TICKERS.forEach(() => {
+  tickers.forEach(() => {
     const sk = document.createElement('div');
     sk.className = 'loading-card';
     sk.innerHTML = `<div class="skeleton" style="height:20px;width:80px;margin-bottom:16px"></div><div class="skeleton" style="height:36px;width:140px;margin-bottom:8px"></div><div class="skeleton" style="height:80px;margin-bottom:12px"></div><div class="skeleton" style="height:60px"></div>`;
     grid.appendChild(sk);
   });
 
-  const results = await Promise.allSettled(TICKERS.map(t => fetchYahoo(t)));
+  const results = await Promise.allSettled(tickers.map(t => fetchYahoo(t)));
   grid.innerHTML = '';
   results.forEach((r, i) => {
+    const ticker = tickers[i];
+    const chartId = 'chart-' + ticker.replace('-', '');
     if (r.status === 'fulfilled') {
-      const card = createCard(TICKERS[i], r.value, i);
+      const card = createCard(ticker, r.value, i, isCrypto);
       grid.appendChild(card);
-      requestAnimationFrame(() => drawSparkline(`chart-${TICKERS[i]}`, r.value.prices, r.value.variation >= 0));
+      requestAnimationFrame(() => drawSparkline(chartId, r.value.prices, r.value.variation >= 0));
     } else {
       const err = document.createElement('div');
       err.className = 'loading-card';
-      err.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted)">⚠️ ${TICKERS[i]} — Données indisponibles</div>`;
+      err.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted)">⚠️ ${ticker} — Données indisponibles</div>`;
       grid.appendChild(err);
     }
   });
+}
 
+async function loadAllStocks() {
+  await loadGrid(TICKERS, 'stocksGrid', false);
   const now = new Date();
   document.getElementById('lastUpdate').textContent = `Dernière mise à jour : ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+async function loadAllCryptos() {
+  await loadGrid(CRYPTOS, 'cryptosGrid', true);
 }
 
 function updateMarketStatus() {
@@ -398,7 +449,7 @@ async function refreshAll() {
   btn.classList.add('loading');
   btn.innerHTML = '<span class="refresh-icon">↻</span> Chargement...';
   updateMarketStatus();
-  await Promise.all([fetchMarketData(), loadAllStocks()]);
+  await Promise.all([fetchMarketData(), loadAllStocks(), loadAllCryptos()]);
   btn.classList.remove('loading');
   btn.innerHTML = '<span class="refresh-icon">↻</span> Actualiser';
 }
@@ -406,6 +457,7 @@ async function refreshAll() {
 updateMarketStatus();
 fetchMarketData();
 loadAllStocks();
+loadAllCryptos();
 setInterval(refreshAll, 15 * 60 * 1000);
 setInterval(updateMarketStatus, 60 * 1000);
 </script>
